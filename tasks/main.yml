@@ -42,15 +42,15 @@
 
 - name: condor repo file for RHEL7
   copy:
-    src: "{{ condor_stable_repo.src | default('htcondor-8.6-rhel7.repo')}}"
+    src: "{{ condor_stable_repo.src | default('htcondor-8.8-rhel7.repo')}}"
     dest: "{{ condor_stable_repo.dest }}"
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'
 
 - name: condor repo file for RHEL8
   copy:
     src: "{{ condor_stable_repo.src | default('htcondor-8.8-rhel8.repo')}}"
     dest: "{{ condor_stable_repo.dest }}"
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '8'
 
 
 - name: Check if EPEL repo is already configured.
@@ -77,7 +77,7 @@
   notify: reload condor
 
 - name: Copy local config
-  template:
+  ansible.builtin.template:
     src: condor_config.j2
     dest: /etc/condor/condor_config.local
     owner: root
@@ -87,9 +87,9 @@
   when: condor_copy_template | bool
 
 - name: condor walltime script
-  copy:
+  ansible.builtin.copy:
     dest: /etc/condor/meta_walltime.py
-    src:  meta_walltime.py
+    src: meta_walltime.py
     mode: 0755
   notify: reload condor
 
@@ -97,15 +97,15 @@
   service_facts:
 
 - name: enable and stop condor
-  service:
+  ansible.builtin.service:
     name: condor
-    enabled: yes
+    enabled: true
     state: stopped
   when: not condor_copy_template | bool
 
 - name: enable and start condor
-  service:
+  ansible.builtin.service:
     name: condor
-    enabled: yes
+    enabled: true
     state: started
   when: condor_copy_template | bool
