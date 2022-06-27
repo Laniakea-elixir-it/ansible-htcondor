@@ -63,7 +63,7 @@
     dest: "{{ epel_repofile_path }}"
     line: 'exclude=condor*'
     insertafter: '^ *enabled=1'
-  when: not epel_repofile_result.stat.exists
+  when: epel_repofile_result.stat.exists
 
 - name: condor install
   package:
